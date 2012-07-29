@@ -123,33 +123,27 @@
 				this.$.todoList.hide();
 				this.$.footer.hide();
 			} else {
-
 				this.$.todoList.show();
 				this.$.footer.show();
-			
 
-			var remaining=Todos.remaining().length; // example how to call collection functions
-			var count=Todos.pluralize(remaining);
-			this.$.todocount.setContent(remaining+" "+count+" left");
-			if (Todos.length===0) {
-				this.$.clearAll.disable();
-			} else {
-			if (remaining === 0) {
-				this.$.clearAll.setValue(true);
-			} else {
-				this.$.clearAll.setValue(false);
-			}
-			}
-			// hide or show&update clear completed button
-			var done=Todos.done().length;
-			if (done>0) {
-				this.$.clearcompleted.setContent("Clear completed ("+done+")");
-				this.$.clearcompleted.show();
-			} else {
-				this.$.clearcompleted.hide();
-			}
-			}
+				var remaining=Todos.remaining().length; // example how to call collection functions
+				var count=Todos.pluralize(remaining);
+				this.$.todocount.setContent(remaining+" "+count+" left");
 
+				if (remaining === 0) {
+					this.$.clearAll.setValue(true);
+				} else {
+					this.$.clearAll.setValue(false);
+				}
+				// hide or show&update clear completed button
+				var done=Todos.done().length;
+				if (done>0) {
+					this.$.clearcompleted.setContent("Clear completed ("+done+")");
+					this.$.clearcompleted.show();
+				} else {
+					this.$.clearcompleted.hide();
+				}
+			}
 		},
 		addTodo: function(value) {
 			if(!value) {
