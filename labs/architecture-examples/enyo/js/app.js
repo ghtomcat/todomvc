@@ -55,8 +55,8 @@
 				{kind: "onyx.Toolbar", classes: "title", components: [
 					{content: "Todos"}
 				]},
-				{ classes: "todo-new", components: [
-				    {kind:"onyx.Checkbox", classes: "toggle-all", name:"clearAll", onchange: "clearAll"}, // checkbox to toggle all todo checkboxes
+				{classes: "todo-new", components: [
+				    {kind:"onyx.Checkbox", classes: "toggle-all", name:"clearAll", onchange: "clearAll"},
 					{kind: "onyx.Input", classes: "todo-new-input", name: "newTodo", placeholder: "What needs to be done?", onkeydown: "addOnEnter"}
 				]},
 					{kind: "Repeater", classes: "todo-list", name: "todoList", count: 0, onSetupItem: "setupItem", components: [
@@ -119,13 +119,26 @@
 			}
 		},
 		refreshRemaining: function() {
+			if (Todos.length===0) {
+				this.$.todoList.hide();
+				this.$.footer.hide();
+			} else {
+
+				this.$.todoList.show();
+				this.$.footer.show();
+			
+
 			var remaining=Todos.remaining().length; // example how to call collection functions
 			var count=Todos.pluralize(remaining);
 			this.$.todocount.setContent(remaining+" "+count+" left");
+			if (Todos.length===0) {
+				this.$.clearAll.disable();
+			} else {
 			if (remaining === 0) {
 				this.$.clearAll.setValue(true);
 			} else {
 				this.$.clearAll.setValue(false);
+			}
 			}
 			// hide or show&update clear completed button
 			var done=Todos.done().length;
@@ -134,6 +147,7 @@
 				this.$.clearcompleted.show();
 			} else {
 				this.$.clearcompleted.hide();
+			}
 			}
 
 		},
@@ -146,11 +160,12 @@
 				done:    false
 			});
 			this.$.todoList.setCount(Todos.length); // setCount refreshes the Repeater
+			this.$.newTodo.hasNode().blur() // remove focus from input field
 			this.refreshRemaining();
 		},
 		inputChange: function(inSender, inEvent) {
 			Todos.at(inEvent.index).save({"content": inSender.getValue()}); // update the content attribute in the model at index
-			inEvent.originator.hasNode().blur() // remove focus from input field;
+			inEvent.originator.hasNode().blur() // remove focus from input field
 		},
 		doneChange: function(inSender, inEvent) {
 			Todos.at(inEvent.index).save({"done": !Todos.at(inEvent.index).get("done")}); // toggle the done attribute in the model at index
