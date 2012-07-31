@@ -101,7 +101,6 @@ Backbone.LocalStorage.sync = window.Store.sync = Backbone.localSync = function(m
   }
 
   var resp;
-
   switch (method) {
     case "read":    resp = model.id != undefined ? store.find(model) : store.findAll(); break;
     case "create":  resp = store.create(model);                            break;

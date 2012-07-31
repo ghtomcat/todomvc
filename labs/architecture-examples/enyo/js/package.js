@@ -3,7 +3,5 @@ enyo.depends(
 	'lib/backbone/backbone.js',
 	'lib/backbone/backbone.localStorage.js',
 	'app.js',
-	'../css/app.css',
-	'lib/enyo/onyx/package.js',
-	'lib/enyo/layout/package.js'
+	'../css/app.css'
 );

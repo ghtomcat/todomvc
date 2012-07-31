@@ -17,7 +17,8 @@
   
     model: Todo,
     localStorage: new Store("todos-enyo"),
-  
+  	//url : 'http://localhost:8080/todo',
+
     // Returns all done todos.
     done: function() {
       return this.filter(function(todo){
@@ -49,29 +50,27 @@
 
 	enyo.kind({
 		name: "App",
-		classes: "app unselectable",
+		classes: "unselectable",
 		components: [
-			{kind: "FittableRows", components: [
-				{kind: "onyx.Toolbar", classes: "title", components: [
-					{content: "Todos"}
-				]},
+			{content: "todos",classes: "title"},
+			{classes: "app", components: [
 				{classes: "todo-new", components: [
-				    {kind:"onyx.Checkbox", classes: "toggle-all", name:"clearAll", onchange: "clearAll"},
-					{kind: "onyx.Input", classes: "todo-new-input", name: "newTodo", placeholder: "What needs to be done?", onkeydown: "addOnEnter"}
+				    {kind:"enyo.Checkbox", classes: "toggle-all", name:"clearAll", onchange: "clearAll"},
+					{kind: "enyo.Input", classes: "todo-new-input", name: "newTodo", placeholder: "What needs to be done?", onkeydown: "addOnEnter"}
 				]},
-					{kind: "Repeater", classes: "todo-list", name: "todoList", count: 0, onSetupItem: "setupItem", components: [
-						{name: "item", classes: "item", components: [
-							{kind:"onyx.Checkbox", classes: "item-checkbox", name:"isDone", onchange: "doneChange"},
-							{kind:"onyx.Input", classes: "item-input", name: "input", onchange: "inputChange"},
-							{kind: "onyx.IconButton", classes: "item-delete", src: "assets/toolbar-icon-delete.png", ontap: "deleteItem"}
-						]}
-					]},
+				{kind: "Repeater", classes: "todo-list", name: "todoList", count: 0, onSetupItem: "setupItem", components: [
+					{name: "item", classes: "item", components: [
+						{kind:"enyo.Checkbox", classes: "item-checkbox", name:"isDone", onchange: "doneChange"},
+						{kind:"enyo.Input", classes: "item-input", name: "input", onchange: "inputChange"},
+						{classes: "item-delete",ontap: "deleteItem"}
+					]}
+				]},
+				{name:"footer",classes:"footer", components: [
+					{name:"todocount", classes: "todo-count", content:""},
+					{name:"filters", content: "All Active Completed"},
+					{name:"clearcompleted",classes:"clear-completed", tag:"button", content:"", ontap: "clearCompleted"}
+				]},
 			]},
-			{name:"footer",classes:"footer", components: [
-				{name:"todocount", classes: "todo-count", content:""},
-				{name:"filters", content: "All Active Completed"},
-				{name:"clearcompleted",classes:"clear-completed", tag:"button", content:"", ontap: "clearCompleted"}
-			]}
 		],
 
 		clearAll: function(inSender, inEvent){
@@ -80,7 +79,8 @@
 			var z = x.getComponents();
 			for(var i =0;i < z.length; i++){
 				z[i].$.isDone.setValue(value)
-				this.setTextStyle(z[i].$.input, value);
+				this.setTextStyle(z[i].$.input, value,"completed");
+				this.setTextStyle(z[i].$.isDone, value,"checked");
 				Todos.at(i).save({"done": value});
 			}
 			this.refreshRemaining();
@@ -90,11 +90,11 @@
 			this.$.todoList.setCount(Todos.length); // setCount refreshes the Repeater
 			this.refreshRemaining();
 		},
-		setTextStyle: function(input, value){
+		setTextStyle: function(input, value, classname){
 			if(value) {
-				input.addClass("completed");
+				input.addClass(classname);
 			} else {
-				input.removeClass("completed");
+				input.removeClass(classname);
 			}
 		},
 
@@ -163,7 +163,8 @@
 		},
 		doneChange: function(inSender, inEvent) {
 			Todos.at(inEvent.index).save({"done": !Todos.at(inEvent.index).get("done")}); // toggle the done attribute in the model at index
-			this.setTextStyle(inEvent.originator.container.children[1], Todos.at(inEvent.index).get("done"));
+			this.setTextStyle(inEvent.originator.container.children[1], Todos.at(inEvent.index).get("done"),"completed");
+			this.setTextStyle(inEvent.originator.container.children[0],Todos.at(inEvent.index).get("done"),"checked");
 			this.refreshRemaining();
 		},
 		deleteItem: function(inSender, inEvent) {
