@@ -75,14 +75,10 @@
 
 		clearAll: function(inSender, inEvent){
 			var value = inSender.getValue();
-			var x = this.$.todoList;
-			var z = x.getComponents();
-			for(var i =0;i < z.length; i++){
-				z[i].$.isDone.setValue(value)
-				this.setTextStyle(z[i].$.input, value,"completed");
-				this.setTextStyle(z[i].$.isDone, value,"checked");
+			for ( i = 0, l = this.Todos.length; i < l; i++ ) {
 				Todos.at(i).save({"done": value});
 			}
+			this.$.todoList.setCount(this.Todos.length);
 			this.refreshRemaining();
 		},
 		clearCompleted: function(inSender, inEvent) {
@@ -90,14 +86,6 @@
 			this.$.todoList.setCount(Todos.length); // setCount refreshes the Repeater
 			this.refreshRemaining();
 		},
-		setTextStyle: function(input, value, classname){
-			if(value) {
-				input.addClass(classname);
-			} else {
-				input.removeClass(classname);
-			}
-		},
-
 		rendered: function() {
 			Todos.fetch();
 			this.$.todoList.setCount(Todos.length);
@@ -106,10 +94,14 @@
 		},
 		setupItem: function(inSender, inEvent) {
 			if (Todos.at(inEvent.index)) {
+				// update values
 				inEvent.item.$.input.setValue(Todos.at(inEvent.index).get("content")); // get value from model and update repeater item
 				inEvent.item.$.isDone.setValue(Todos.at(inEvent.index).get("done")); // get value from model and update repeater item
-				this.setTextStyle(inEvent.item.$.input, Todos.at(inEvent.index).get("done"));
+				// update classes
+				inEvent.item.$.input.addRemoveClass("completed", Todos.at(inEvent.index).get("done"));
+				inEvent.item.$.isDone.addRemoveClass("checked", Todos.at(inEvent.index).get("done"));
 			}
+			return true;
 		},
 		addOnEnter: function(inSender, inEvent) {
 			if (inEvent.keyCode === 13) {
@@ -158,13 +150,16 @@
 			this.refreshRemaining();
 		},
 		inputChange: function(inSender, inEvent) {
+			if(!inSender.getValue()) {
+				return; // empty string
+			}
 			Todos.at(inEvent.index).save({"content": inSender.getValue()}); // update the content attribute in the model at index
 			inEvent.originator.hasNode().blur() // remove focus from input field
 		},
 		doneChange: function(inSender, inEvent) {
 			Todos.at(inEvent.index).save({"done": !Todos.at(inEvent.index).get("done")}); // toggle the done attribute in the model at index
-			this.setTextStyle(inEvent.originator.container.children[1], Todos.at(inEvent.index).get("done"),"completed");
-			this.setTextStyle(inEvent.originator.container.children[0],Todos.at(inEvent.index).get("done"),"checked");
+			// re-render list item at index
+			this.$.todoList.renderRow(inEvent.index);
 			this.refreshRemaining();
 		},
 		deleteItem: function(inSender, inEvent) {
