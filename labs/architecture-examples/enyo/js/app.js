@@ -74,11 +74,12 @@
 		],
 
 		clearAll: function(inSender, inEvent){
+			var i,l;
 			var value = inSender.getValue();
-			for ( i = 0, l = this.Todos.length; i < l; i++ ) {
+			for ( i = 0, l = Todos.length; i < l; i++ ) {
 				Todos.at(i).save({"done": value});
 			}
-			this.$.todoList.setCount(this.Todos.length);
+			this.$.todoList.setCount(Todos.length);
 			this.refreshRemaining();
 		},
 		clearCompleted: function(inSender, inEvent) {
